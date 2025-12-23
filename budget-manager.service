@@ -1,0 +1,35 @@
+[Unit]
+Description=Budget Manager - Application Flask de gestion de budget
+After=network.target
+
+[Service]
+Type=notify
+User=root
+Group=root
+
+# Répertoire de travail
+WorkingDirectory=/root/gestion-budget-julie
+
+# Variables d'environnement
+Environment="PATH=/root/gestion-budget-julie/.venv/bin"
+Environment="FLASK_ENV=production"
+EnvironmentFile=/root/gestion-budget-julie/.env
+
+# Commande de démarrage avec Gunicorn
+# -w 2 : 2 workers (ajuster selon vos CPU LXC)
+# -b 0.0.0.0:5001 : bind sur toutes les interfaces port 5001
+# --access-logfile : logs d'accès
+# --error-logfile : logs d'erreurs
+ExecStart=/root/gestion-budget-julie/.venv/bin/gunicorn --workers 2 --bind 0.0.0.0:5001 wsgi:app
+
+# Redémarrage automatique en cas de crash
+Restart=always
+RestartSec=10
+
+# Logs systemd
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=budget-manager
+
+[Install]
+WantedBy=multi-user.target
