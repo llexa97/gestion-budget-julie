@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if action == 'create' %}
+        Créer une transaction
+    {% else %}
+        Modifier une transaction
+    {% endif %}
+    - Gestion de Budget
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">
+            {% if action == 'create' %}
+                Créer une transaction
+            {% else %}
+                Modifier une transaction
+            {% endif %}
+        </h1>
+        <p class="mt-2 text-sm text-gray-600">
+            Période {{ '%02d'|format(period.month) }}/{{ period.year }}
+        </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
+            <h2 class="text-xl font-semibold text-white">Informations de la transaction</h2>
+        </div>
+
+        <form method="POST" class="p-6 space-y-6">
+            {{ form.hidden_tag() }}
+
+            <!-- Type Field -->
+            <div>
+                <label for="{{ form.type.id }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.type.label.text }}
+                </label>
+                <div class="grid grid-cols-2 gap-4">
+                    {% for value, label in form.type.choices %}
+                        <label class="relative flex cursor-pointer rounded-lg border {% if form.type.data == value %}border-blue-500 bg-blue-50{% else %}border-gray-300 bg-white hover:bg-gray-50{% endif %} p-4 focus:outline-none transition-all">
+                            <input type="radio" name="{{ form.type.name }}" value="{{ value }}" {% if form.type.data == value %}checked{% endif %} class="sr-only">
+                            <div class="flex items-center w-full">
+                                {% if value == 'ENTREE' %}
+                                    <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m0-16l-4 4m4-4l4 4"/>
+                                        </svg>
+                                    </div>
+                                {% else %}
+                                    <div class="flex-shrink-0 w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20v-16m0 16l-4-4m4 4l4-4"/>
+                                        </svg>
+                                    </div>
+                                {% endif %}
+                                <span class="text-sm font-medium text-gray-900">{{ label }}</span>
+                            </div>
+                        </label>
+                    {% endfor %}
+                </div>
+                {% if form.type.errors %}
+                    <ul class="mt-2 text-sm text-red-600 space-y-1">
+                        {% for error in form.type.errors %}
+                            <li class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ error }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <!-- Label Field -->
+            <div>
+                <label for="{{ form.label.id }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.label.label.text }}
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                        </svg>
+                    </div>
+                    {{ form.label(class="pl-10 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all", placeholder="Ex: Salaire, Courses, Restaurant...") }}
+                </div>
+                {% if form.label.errors %}
+                    <ul class="mt-2 text-sm text-red-600 space-y-1">
+                        {% for error in form.label.errors %}
+                            <li class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ error }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <!-- Amount and Date Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Amount Field -->
+                <div>
+                    <label for="{{ form.amount.id }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.amount.label.text }}
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">€</span>
+                        </div>
+                        {{ form.amount(class="pl-8 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all", step="0.01", placeholder="0.00") }}
+                    </div>
+                    {% if form.amount.errors %}
+                        <ul class="mt-2 text-sm text-red-600 space-y-1">
+                            {% for error in form.amount.errors %}
+                                <li class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {{ error }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Date Field -->
+                <div>
+                    <label for="{{ form.date.id }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.date.label.text }}
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        {{ form.date(class="pl-10 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all", type="date") }}
+                    </div>
+                    {% if form.date.errors %}
+                        <ul class="mt-2 text-sm text-red-600 space-y-1">
+                            {% for error in form.date.errors %}
+                                <li class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {{ error }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Category Field -->
+            <div>
+                <label for="{{ form.category.id }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.category.label.text }}
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                    </div>
+                    {{ form.category(class="pl-10 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all", placeholder="Ex: Alimentation, Transport, Loisirs...") }}
+                </div>
+                {% if form.category.errors %}
+                    <ul class="mt-2 text-sm text-red-600 space-y-1">
+                        {% for error in form.category.errors %}
+                            <li class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ error }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <!-- Notes Field -->
+            <div>
+                <label for="{{ form.notes.id }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.notes.label.text }}
+                </label>
+                {{ form.notes(class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all", rows=3, placeholder="Ajoutez des notes complémentaires...") }}
+                {% if form.notes.errors %}
+                    <ul class="mt-2 text-sm text-red-600 space-y-1">
+                        {% for error in form.notes.errors %}
+                            <li class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ error }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{{ url_for('periods.detail', period_id=period.id) }}" class="px-6 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 font-medium rounded-lg transition-colors">
+                    Annuler
+                </a>
+                <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    {% if action == 'create' %}Créer la transaction{% else %}Modifier la transaction{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Help Text -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">Conseil</h3>
+                <p class="mt-1 text-sm text-blue-700">
+                    Utilisez des libellés clairs et des catégories pour retrouver facilement vos transactions plus tard. Les champs catégorie et notes sont optionnels.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
