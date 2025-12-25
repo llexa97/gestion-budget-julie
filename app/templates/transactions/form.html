@@ -41,7 +41,13 @@
                 </label>
                 <div class="grid grid-cols-3 gap-4">
                     {% for value, label in form.type.choices %}
-                        <label class="relative flex cursor-pointer rounded-lg border {% if form.type.data == value %}border-blue-500 bg-blue-50{% else %}border-gray-300 bg-white hover:bg-gray-50{% endif %} p-4 focus:outline-none transition-all">
+                        <label class="relative flex cursor-pointer rounded-lg border-2
+                            {% if form.type.data == value %}
+                                {% if value == 'ENTREE' %}border-green-500 bg-green-50 shadow-lg scale-105{% elif value == 'DEPENSE' %}border-red-500 bg-red-50 shadow-lg scale-105{% else %}border-yellow-500 bg-yellow-50 shadow-lg scale-105{% endif %}
+                            {% else %}
+                                border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400
+                            {% endif %}
+                            p-4 focus:outline-none transition-all duration-200 transform">
                             <input type="radio" name="{{ form.type.name }}" value="{{ value }}" {% if form.type.data == value %}checked{% endif %} class="sr-only">
                             <div class="flex items-center w-full">
                                 {% if value == 'ENTREE' %}
@@ -63,7 +69,7 @@
                                         </svg>
                                     </div>
                                 {% endif %}
-                                <span class="text-sm font-medium text-gray-900">{{ label }}</span>
+                                <span class="text-sm font-medium {% if form.type.data == value %}{% if value == 'ENTREE' %}text-green-700{% elif value == 'DEPENSE' %}text-red-700{% else %}text-yellow-700{% endif %}{% else %}text-gray-900{% endif %}">{{ label }}</span>
                             </div>
                         </label>
                     {% endfor %}
@@ -213,4 +219,38 @@
         </div>
     </div>
 </div>
+
+<script>
+// Gérer le changement visuel instantané lors du clic sur un type
+document.addEventListener('DOMContentLoaded', function() {
+    const radioInputs = document.querySelectorAll('input[name="{{ form.type.name }}"]');
+    const labels = document.querySelectorAll('label[class*="cursor-pointer"]');
+
+    radioInputs.forEach((radio, index) => {
+        radio.addEventListener('change', function() {
+            // Réinitialiser tous les labels et spans
+            labels.forEach(label => {
+                label.className = 'relative flex cursor-pointer rounded-lg border-2 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 p-4 focus:outline-none transition-all duration-200 transform';
+                const span = label.querySelector('span');
+                if (span) span.className = 'text-sm font-medium text-gray-900';
+            });
+
+            // Appliquer le style au label sélectionné
+            const selectedLabel = labels[index];
+            const value = radio.value;
+
+            if (value === 'ENTREE') {
+                selectedLabel.className = 'relative flex cursor-pointer rounded-lg border-2 border-green-500 bg-green-50 shadow-lg scale-105 p-4 focus:outline-none transition-all duration-200 transform';
+                selectedLabel.querySelector('span').className = 'text-sm font-medium text-green-700';
+            } else if (value === 'DEPENSE') {
+                selectedLabel.className = 'relative flex cursor-pointer rounded-lg border-2 border-red-500 bg-red-50 shadow-lg scale-105 p-4 focus:outline-none transition-all duration-200 transform';
+                selectedLabel.querySelector('span').className = 'text-sm font-medium text-red-700';
+            } else {
+                selectedLabel.className = 'relative flex cursor-pointer rounded-lg border-2 border-yellow-500 bg-yellow-50 shadow-lg scale-105 p-4 focus:outline-none transition-all duration-200 transform';
+                selectedLabel.querySelector('span').className = 'text-sm font-medium text-yellow-700';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
