@@ -36,12 +36,11 @@ def upgrade():
         sa.ForeignKeyConstraint(['period_id'], ['periods.id']),
         sa.CheckConstraint('amount >= 0', name='positive_amount'),
         sa.CheckConstraint("type IN ('ENTREE', 'DEPENSE', 'EPARGNE')", name='valid_type'),
+        # L'index sera automatiquement copié, pas besoin de le recréer
+        sa.Index('idx_period_type', 'period_id', 'type'),
     )) as batch_op:
         # La colonne 'date' sera automatiquement supprimée car elle n'est pas dans copy_from
         pass
-
-    # Recréer l'index
-    op.create_index('idx_period_type', 'transactions', ['period_id', 'type'], unique=False)
 
 
 def downgrade():
