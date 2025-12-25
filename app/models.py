@@ -94,7 +94,7 @@ class Transaction(db.Model):
 
     # Contraintes
     __table_args__ = (
-        db.CheckConstraint('amount > 0', name='positive_amount'),
+        db.CheckConstraint('amount >= 0', name='positive_amount'),
         db.CheckConstraint("type IN ('ENTREE', 'DEPENSE', 'EPARGNE')", name='valid_type'),
         db.Index('idx_period_type', 'period_id', 'type'),
     )

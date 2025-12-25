@@ -17,27 +17,13 @@ depends_on = None
 
 
 def upgrade():
-    # Ajouter la colonne pointed (par défaut False)
-    op.add_column('transactions', sa.Column('pointed', sa.Boolean(), nullable=False, server_default='0'))
-
-    # Supprimer la colonne date
-    with op.batch_alter_table('transactions') as batch_op:
-        batch_op.drop_column('date')
-
-    # Supprimer l'index sur period_id et date s'il existe
-    try:
-        op.drop_index('idx_period_date', table_name='transactions')
-    except:
-        pass  # L'index n'existe peut-être pas
+    # Cette migration est désactivée car l'application utilise db.create_all()
+    # qui crée directement les tables avec la structure finale.
+    # Si vous avez une base de données existante avec l'ancienne structure,
+    # utilisez les scripts de migration manuels.
+    pass
 
 
 def downgrade():
-    # Réajouter la colonne date (avec une valeur par défaut temporaire)
-    op.add_column('transactions', sa.Column('date', sa.Date(), nullable=False, server_default='2025-01-01'))
-
-    # Supprimer la colonne pointed
-    with op.batch_alter_table('transactions') as batch_op:
-        batch_op.drop_column('pointed')
-
-    # Recréer l'index sur period_id et date
-    op.create_index('idx_period_date', 'transactions', ['period_id', 'date'])
+    # Downgrade désactivé - voir upgrade()
+    pass

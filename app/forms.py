@@ -33,7 +33,7 @@ class TransactionForm(FlaskForm):
         'Montant',
         validators=[
             DataRequired(message='Le montant est obligatoire'),
-            NumberRange(min=0.01, message='Le montant doit être supérieur à 0')
+            NumberRange(min=0, message='Le montant doit être supérieur ou égal à 0')
         ],
         places=2
     )

@@ -17,14 +17,19 @@ depends_on = None
 
 
 def upgrade():
-    # Note: La contrainte CHECK est définie dans le modèle SQLAlchemy.
-    # Pour SQLite, modifier une contrainte CHECK nécessite de recréer la table,
-    # ce qui est complexe. La contrainte sera mise à jour automatiquement lors
-    # de la prochaine initialisation de la base de données avec db.create_all().
-    # En production, si la base de données existe déjà, elle devra être recréée
-    # ou une migration plus complexe devra être écrite pour recréer la table.
-    pass
+    # Pour SQLite : modifier une contrainte CHECK nécessite de recréer la table
+    # batch_alter_table gère automatiquement la recréation de la table
+    with op.batch_alter_table('transactions', schema=None, copy_from=None,
+                               table_kwargs={
+                                   'sqlite_autoincrement': True
+                               }) as batch_op:
+        # Supprimer l'ancienne contrainte et en ajouter une nouvelle avec EPARGNE
+        batch_op.drop_constraint('valid_type', type_='check')
+        batch_op.create_check_constraint('valid_type', "type IN ('ENTREE', 'DEPENSE', 'EPARGNE')")
 
 
 def downgrade():
-    pass
+    # Retour à la contrainte sans EPARGNE
+    with op.batch_alter_table('transactions', schema=None) as batch_op:
+        batch_op.drop_constraint('valid_type', type_='check')
+        batch_op.create_check_constraint('valid_type', "type IN ('ENTREE', 'DEPENSE')")
