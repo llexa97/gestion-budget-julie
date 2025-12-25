@@ -26,7 +26,7 @@ class TransactionForm(FlaskForm):
     """Formulaire pour créer/modifier une transaction"""
     type = SelectField(
         'Type',
-        choices=[('ENTREE', 'Entrée'), ('DEPENSE', 'Dépense')],
+        choices=[('ENTREE', 'Entrée'), ('DEPENSE', 'Dépense'), ('EPARGNE', 'Épargne')],
         validators=[DataRequired()]
     )
     amount = DecimalField(

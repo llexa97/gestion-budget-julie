@@ -19,7 +19,7 @@
     </div>
 
     <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Total Entrées -->
         <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
             <div class="p-6">
@@ -58,6 +58,25 @@
             </div>
         </div>
 
+        <!-- Total Épargne -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Épargne</p>
+                        <p class="text-2xl font-bold text-yellow-600">{{ '%.2f'|format(period.get_total_epargne()) }} €</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Résultat -->
         <div class="bg-white rounded-xl shadow-md border-2 {% if period.get_resultat() >= 0 %}border-blue-200{% else %}border-orange-200{% endif %} overflow-hidden">
             <div class="p-6">
@@ -81,7 +100,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 flex-wrap">
         <a href="{{ url_for('transactions.create', period_id=period.id, type='ENTREE') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -94,6 +113,12 @@
             </svg>
             Ajouter une dépense
         </a>
+        <a href="{{ url_for('transactions.create', period_id=period.id, type='EPARGNE') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Ajouter une épargne
+        </a>
     </div>
 
     <!-- Filters -->
@@ -105,6 +130,7 @@
                     <option value="">Tous</option>
                     <option value="ENTREE" {% if filters.type == 'ENTREE' %}selected{% endif %}>Entrées</option>
                     <option value="DEPENSE" {% if filters.type == 'DEPENSE' %}selected{% endif %}>Dépenses</option>
+                    <option value="EPARGNE" {% if filters.type == 'EPARGNE' %}selected{% endif %}>Épargne</option>
                 </select>
             </div>
             <div>
@@ -176,12 +202,19 @@
                                             </svg>
                                             Entrée
                                         </span>
-                                    {% else %}
+                                    {% elif transaction.type == 'DEPENSE' %}
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20v-16m0 16l-4-4m4 4l4-4"/>
                                             </svg>
                                             Dépense
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            Épargne
                                         </span>
                                     {% endif %}
                                 </td>
@@ -195,7 +228,7 @@
                                         <span class="text-gray-400">-</span>
                                     {% endif %}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold {% if transaction.type == 'ENTREE' %}text-green-600{% else %}text-red-600{% endif %}">
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold {% if transaction.type == 'ENTREE' %}text-green-600{% elif transaction.type == 'DEPENSE' %}text-red-600{% else %}text-yellow-600{% endif %}">
                                     {{ '%.2f'|format(transaction.amount) }} €
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -229,7 +262,7 @@
             </div>
             <h3 class="text-lg font-semibold text-gray-900 mb-2">Aucune transaction</h3>
             <p class="text-gray-600 mb-6">Commencez par ajouter votre première transaction</p>
-            <div class="flex items-center justify-center gap-3">
+            <div class="flex items-center justify-center gap-3 flex-wrap">
                 <a href="{{ url_for('transactions.create', period_id=period.id, type='ENTREE') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -241,6 +274,12 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Ajouter une dépense
+                </a>
+                <a href="{{ url_for('transactions.create', period_id=period.id, type='EPARGNE') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Ajouter une épargne
                 </a>
             </div>
         </div>

@@ -9,6 +9,7 @@ class TransactionType(Enum):
     """Type de transaction"""
     ENTREE = "ENTREE"
     DEPENSE = "DEPENSE"
+    EPARGNE = "EPARGNE"
 
 
 class Period(db.Model):
@@ -61,9 +62,16 @@ class Period(db.Model):
             if t.type == TransactionType.DEPENSE.value
         ) or Decimal('0.00')
 
+    def get_total_epargne(self):
+        """Calcule le total de l'épargne pour cette période"""
+        return sum(
+            t.amount for t in self.transactions
+            if t.type == TransactionType.EPARGNE.value
+        ) or Decimal('0.00')
+
     def get_resultat(self):
-        """Calcule le résultat (entrées - dépenses)"""
-        return self.get_total_entrees() - self.get_total_depenses()
+        """Calcule le résultat (entrées - dépenses - épargne)"""
+        return self.get_total_entrees() - self.get_total_depenses() - self.get_total_epargne()
 
 
 class Transaction(db.Model):
@@ -87,7 +95,7 @@ class Transaction(db.Model):
     # Contraintes
     __table_args__ = (
         db.CheckConstraint('amount > 0', name='positive_amount'),
-        db.CheckConstraint("type IN ('ENTREE', 'DEPENSE')", name='valid_type'),
+        db.CheckConstraint("type IN ('ENTREE', 'DEPENSE', 'EPARGNE')", name='valid_type'),
         db.Index('idx_period_type', 'period_id', 'type'),
     )
 
