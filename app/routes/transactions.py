@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
+import logging
 
 from app import db
 from app.models import Transaction, Period
@@ -6,18 +7,35 @@ from app.forms import TransactionForm
 
 bp = Blueprint('transactions', __name__, url_prefix='/transactions')
 
+# Configuration du logger
+logger = logging.getLogger(__name__)
+
 
 @bp.route('/create/<int:period_id>', methods=['GET', 'POST'])
 def create(period_id):
     """Créer une nouvelle transaction pour une période"""
+    logger.info(f"📝 [CREATE] Début création transaction pour période {period_id}")
+    logger.info(f"📝 [CREATE] Méthode: {request.method}")
+
     period = Period.query.get_or_404(period_id)
+    logger.info(f"📝 [CREATE] Période trouvée: {period.get_formatted_period()}")
+
     form = TransactionForm()
 
     # Pré-remplir le type si passé en paramètre
     if request.method == 'GET' and request.args.get('type'):
         form.type.data = request.args.get('type')
+        logger.info(f"📝 [CREATE] Type pré-rempli: {form.type.data}")
 
     if form.validate_on_submit():
+        logger.info(f"📝 [CREATE] Formulaire validé avec succès")
+        logger.info(f"📝 [CREATE] Données du formulaire:")
+        logger.info(f"  - Type: {form.type.data}")
+        logger.info(f"  - Amount: {form.amount.data}")
+        logger.info(f"  - Label: {form.label.data}")
+        logger.info(f"  - Category: {form.category.data}")
+        logger.info(f"  - Notes: {form.notes.data}")
+
         transaction = Transaction(
             period_id=period_id,
             type=form.type.data,
@@ -27,15 +45,26 @@ def create(period_id):
             notes=form.notes.data,
             pointed=False
         )
+        logger.info(f"📝 [CREATE] Objet Transaction créé")
 
         try:
+            logger.info(f"📝 [CREATE] Tentative d'ajout à la session DB")
             db.session.add(transaction)
+            logger.info(f"📝 [CREATE] Transaction ajoutée à la session, tentative de commit")
             db.session.commit()
+            logger.info(f"✅ [CREATE] Transaction créée avec succès - ID: {transaction.id}")
             flash(f'Transaction "{transaction.label}" ajoutée avec succès', 'success')
             return redirect(url_for('periods.detail', period_id=period_id))
         except Exception as e:
+            logger.error(f"❌ [CREATE] Erreur lors de la création: {type(e).__name__}")
+            logger.error(f"❌ [CREATE] Message d'erreur: {str(e)}")
+            logger.error(f"❌ [CREATE] Détails complets:", exc_info=True)
             db.session.rollback()
-            flash('Erreur lors de la création de la transaction', 'error')
+            flash(f'Erreur lors de la création de la transaction: {str(e)}', 'error')
+    else:
+        if request.method == 'POST':
+            logger.warning(f"⚠️  [CREATE] Formulaire invalide")
+            logger.warning(f"⚠️  [CREATE] Erreurs de validation: {form.errors}")
 
     return render_template('transactions/form.html', form=form, period=period, action='create')
 
