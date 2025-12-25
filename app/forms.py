@@ -1,7 +1,7 @@
 from datetime import date
 from flask_wtf import FlaskForm
-from wtforms import StringField, DecimalField, DateField, SelectField, TextAreaField
-from wtforms.validators import DataRequired, NumberRange, Length, ValidationError
+from wtforms import StringField, DecimalField, SelectField, TextAreaField
+from wtforms.validators import DataRequired, NumberRange, Length
 
 
 class PeriodForm(FlaskForm):
@@ -37,11 +37,6 @@ class TransactionForm(FlaskForm):
         ],
         places=2
     )
-    date = DateField(
-        'Date',
-        validators=[DataRequired()],
-        default=date.today
-    )
     label = StringField(
         'Libellé',
         validators=[
@@ -56,9 +51,3 @@ class TransactionForm(FlaskForm):
     notes = TextAreaField(
         'Notes (optionnel)'
     )
-
-    def validate_date(self, field):
-        """Validation personnalisée pour vérifier que la date appartient au mois de la période"""
-        # Cette validation sera complétée lors de l'utilisation du formulaire
-        # en passant la période en contexte
-        pass

@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from datetime import date
 
 from app import db
 from app.models import Transaction, Period
@@ -19,23 +18,14 @@ def create(period_id):
         form.type.data = request.args.get('type')
 
     if form.validate_on_submit():
-        # Validation optionnelle : vérifier que la date est dans le mois de la période
-        transaction_date = form.date.data
-        if transaction_date.year != period.year or transaction_date.month != period.month:
-            flash(
-                f'Attention : la date de la transaction ({transaction_date.strftime("%d/%m/%Y")}) '
-                f'ne correspond pas au mois de la période ({period.month:02d}/{period.year})',
-                'warning'
-            )
-
         transaction = Transaction(
             period_id=period_id,
             type=form.type.data,
             amount=form.amount.data,
-            date=form.date.data,
             label=form.label.data,
             category=form.category.data,
-            notes=form.notes.data
+            notes=form.notes.data,
+            pointed=False
         )
 
         try:
@@ -58,18 +48,8 @@ def edit(transaction_id):
     form = TransactionForm(obj=transaction)
 
     if form.validate_on_submit():
-        # Validation optionnelle : vérifier que la date est dans le mois de la période
-        transaction_date = form.date.data
-        if transaction_date.year != period.year or transaction_date.month != period.month:
-            flash(
-                f'Attention : la date de la transaction ({transaction_date.strftime("%d/%m/%Y")}) '
-                f'ne correspond pas au mois de la période ({period.month:02d}/{period.year})',
-                'warning'
-            )
-
         transaction.type = form.type.data
         transaction.amount = form.amount.data
-        transaction.date = form.date.data
         transaction.label = form.label.data
         transaction.category = form.category.data
         transaction.notes = form.notes.data
@@ -98,5 +78,21 @@ def delete(transaction_id):
     except Exception as e:
         db.session.rollback()
         flash('Erreur lors de la suppression de la transaction', 'error')
+
+    return redirect(url_for('periods.detail', period_id=period_id))
+
+
+@bp.route('/toggle-pointed/<int:transaction_id>', methods=['POST'])
+def toggle_pointed(transaction_id):
+    """Basculer le statut pointé d'une transaction"""
+    transaction = Transaction.query.get_or_404(transaction_id)
+    period_id = transaction.period_id
+
+    try:
+        transaction.pointed = not transaction.pointed
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        flash('Erreur lors de la mise à jour du pointage', 'error')
 
     return redirect(url_for('periods.detail', period_id=period_id))

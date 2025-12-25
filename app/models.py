@@ -74,10 +74,10 @@ class Transaction(db.Model):
     period_id = db.Column(db.Integer, db.ForeignKey('periods.id'), nullable=False)
     type = db.Column(db.String(10), nullable=False)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
-    date = db.Column(db.Date, nullable=False)
     label = db.Column(db.String(200), nullable=False)
     category = db.Column(db.String(100), nullable=True)
     notes = db.Column(db.Text, nullable=True)
+    pointed = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -88,7 +88,6 @@ class Transaction(db.Model):
     __table_args__ = (
         db.CheckConstraint('amount > 0', name='positive_amount'),
         db.CheckConstraint("type IN ('ENTREE', 'DEPENSE')", name='valid_type'),
-        db.Index('idx_period_date', 'period_id', 'date'),
         db.Index('idx_period_type', 'period_id', 'type'),
     )
 

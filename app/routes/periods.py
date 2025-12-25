@@ -45,7 +45,7 @@ def detail(period_id):
     # Filtres et tri
     transaction_type = request.args.get('type', '')
     search_query = request.args.get('search', '')
-    sort_by = request.args.get('sort', 'date')
+    sort_by = request.args.get('sort', 'amount')
     sort_order = request.args.get('order', 'desc')
 
     # Query de base
@@ -58,12 +58,14 @@ def detail(period_id):
         query = query.filter(Transaction.label.ilike(f'%{search_query}%'))
 
     # Appliquer le tri
-    if sort_by == 'date':
-        order_column = Transaction.date
-    elif sort_by == 'amount':
+    if sort_by == 'amount':
         order_column = Transaction.amount
-    else:
+    elif sort_by == 'label':
         order_column = Transaction.label
+    elif sort_by == 'pointed':
+        order_column = Transaction.pointed
+    else:
+        order_column = Transaction.amount
 
     if sort_order == 'desc':
         query = query.order_by(order_column.desc())
