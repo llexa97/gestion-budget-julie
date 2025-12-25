@@ -219,38 +219,4 @@
         </div>
     </div>
 </div>
-
-<script>
-// Gérer le changement visuel instantané lors du clic sur un type
-document.addEventListener('DOMContentLoaded', function() {
-    const radioInputs = document.querySelectorAll('input[name="{{ form.type.name }}"]');
-    const labels = document.querySelectorAll('label[class*="cursor-pointer"]');
-
-    radioInputs.forEach((radio, index) => {
-        radio.addEventListener('change', function() {
-            // Réinitialiser tous les labels et spans
-            labels.forEach(label => {
-                label.className = 'relative flex cursor-pointer rounded-lg border-2 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 p-4 focus:outline-none transition-all duration-200 transform';
-                const span = label.querySelector('span');
-                if (span) span.className = 'text-sm font-medium text-gray-900';
-            });
-
-            // Appliquer le style au label sélectionné
-            const selectedLabel = labels[index];
-            const value = radio.value;
-
-            if (value === 'ENTREE') {
-                selectedLabel.className = 'relative flex cursor-pointer rounded-lg border-2 border-green-500 bg-green-50 shadow-lg scale-105 p-4 focus:outline-none transition-all duration-200 transform';
-                selectedLabel.querySelector('span').className = 'text-sm font-medium text-green-700';
-            } else if (value === 'DEPENSE') {
-                selectedLabel.className = 'relative flex cursor-pointer rounded-lg border-2 border-red-500 bg-red-50 shadow-lg scale-105 p-4 focus:outline-none transition-all duration-200 transform';
-                selectedLabel.querySelector('span').className = 'text-sm font-medium text-red-700';
-            } else {
-                selectedLabel.className = 'relative flex cursor-pointer rounded-lg border-2 border-yellow-500 bg-yellow-50 shadow-lg scale-105 p-4 focus:outline-none transition-all duration-200 transform';
-                selectedLabel.querySelector('span').className = 'text-sm font-medium text-yellow-700';
-            }
-        });
-    });
-});
-</script>
 {% endblock %}
