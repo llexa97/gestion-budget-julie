@@ -70,8 +70,16 @@ class Period(db.Model):
         ) or Decimal('0.00')
 
     def get_resultat(self):
-        """Calcule le résultat (entrées - dépenses - épargne)"""
-        return self.get_total_entrees() - self.get_total_depenses() - self.get_total_epargne()
+        """Calcule le résultat (entrées - dépenses)"""
+        return self.get_total_entrees() - self.get_total_depenses()
+
+    def get_pointed_count(self):
+        """Retourne le nombre de transactions pointées"""
+        return sum(1 for t in self.transactions if t.pointed)
+
+    def get_total_transactions(self):
+        """Retourne le nombre total de transactions"""
+        return len(self.transactions)
 
 
 class Transaction(db.Model):

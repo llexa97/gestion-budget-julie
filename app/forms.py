@@ -1,7 +1,7 @@
 from datetime import date
 from flask_wtf import FlaskForm
 from wtforms import StringField, DecimalField, SelectField, TextAreaField
-from wtforms.validators import DataRequired, NumberRange, Length
+from wtforms.validators import DataRequired, InputRequired, NumberRange, Length
 
 
 class PeriodForm(FlaskForm):
@@ -32,7 +32,7 @@ class TransactionForm(FlaskForm):
     amount = DecimalField(
         'Montant',
         validators=[
-            DataRequired(message='Le montant est obligatoire'),
+            InputRequired(message='Le montant est obligatoire'),
             NumberRange(min=0, message='Le montant doit être supérieur ou égal à 0')
         ],
         places=2
